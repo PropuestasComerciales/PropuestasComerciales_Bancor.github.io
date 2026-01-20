@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Propuesta Estratégica Bancor - CDA Informática</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js (Mantenido para otras posibles visualizaciones futuras) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Merriweather:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Chosen Palette: CDA Corporate Blue & Orange */
+        :root {
+            --bg-color: #f8fafc; 
+            --text-primary: #0f172a; 
+            --text-secondary: #475569; 
+            --cda-blue: #007dc4; /* R0 G125 B196 */
+            --cda-orange: #f6921e; /* R246 G146 B30 */
+            --card-bg: #ffffff;
+            --success-green: #16a34a;
+            --danger-red: #dc2626;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Merriweather', serif;
+        }
+
+        .nav-item {
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: var(--cda-blue);
+            font-weight: 700;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--cda-orange);
+            border-radius: 2px 2px 0 0;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(0, 125, 196, 0.05);
+        }
+        
+        .card-shadow:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--cda-blue);
+        }
+
+        .btn-cda-primary {
+            background-color: var(--cda-blue);
+            color: white;
+            transition: all 0.3s ease;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .btn-cda-primary:hover {
+            background-color: #0069a5;
+            box-shadow: 0 10px 15px -3px rgba(0, 125, 196, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .hidden-section {
+            display: none;
+            opacity: 0;
+        }
+
+        .visible-section {
+            display: block;
+            opacity: 1;
+            animation: fadeInScale 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .timeline-line {
+            background: linear-gradient(to bottom, var(--cda-blue) 0%, var(--cda-orange) 100%);
+        }
+
+        .custom-bullet::before {
+            content: '•';
+            color: var(--cda-orange);
+            font-weight: bold;
+            display: inline-block; 
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .maturity-tag {
+            padding: 4px 12px;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .tag-low { background-color: #fee2e2; color: #991b1b; }
+        .tag-high { background-color: #dcfce7; color: #166534; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: var(--cda-blue); border-radius: 4px; }
+    </style>
+
+    <!-- Application Structure Plan: 
+         - SPA interactiva estratégica.
+         - Secciones ajustadas:
+            1. Resumen Ejecutivo
+            2. Matriz de Madurez
+            3. Diagnóstico Profundo (Simulador de costo de inacción)
+            4. Solución Técnica (Arquitectura IaC & SecOps)
+            5. Roadmap de 90 Días
+            6. Gobierno y FAQ
+         - Se ha eliminado la sección de Inversión por requerimiento del usuario.
+    -->
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header / Navegación -->
+    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-24">
+                <div class="flex items-center">
+                    <div class="flex flex-col">
+                        <span class="text-3xl font-black tracking-tighter" style="color: var(--cda-blue);">CDA <span style="color: var(--cda-orange);">| BANCOR</span></span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Transformación Core 2026</span>
+                    </div>
+                </div>
+                <div class="hidden lg:flex space-x-2 items-center" id="nav-container">
+                    <button data-target="summary" class="nav-item active text-slate-500 hover:text-slate-900 px-4 py-8 text-xs font-bold uppercase tracking-wider transition-all">Resumen</button>
+                    <button data-target="maturity" class="nav-item text-slate-500 hover:text-slate-900 px-4 py-8 text-xs font-bold uppercase tracking-wider transition-all">Madurez</button>
+                    <button data-target="diagnosis" class="nav-item text-slate-500 hover:text-slate-900 px-4 py-8 text-xs font-bold uppercase tracking-wider transition-all">Diagnóstico</button>
+                    <button data-target="solution" class="nav-item text-slate-500 hover:text-slate-900 px-4 py-8 text-xs font-bold uppercase tracking-wider transition-all">Solución</button>
+                    <button data-target="roadmap" class="nav-item text-slate-500 hover:text-slate-900 px-4 py-8 text-xs font-bold uppercase tracking-wider transition-all">Roadmap</button>
+                    <button data-target="gov" class="nav-item text-slate-500 hover:text-slate-900 px-4 py-8 text-xs font-bold uppercase tracking-wider transition-all">Gobierno</button>
+                </div>
+                <div class="flex items-center lg:hidden">
+                    <button id="mobile-menu-btn" class="p-2 text-slate-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Menú Móvil -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-b border-gray-200 shadow-xl overflow-y-auto max-h-[80vh]">
+            <div class="px-4 py-4 space-y-2">
+                <button data-target="summary" class="block w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-lg">Resumen</button>
+                <button data-target="maturity" class="block w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-lg">Madurez</button>
+                <button data-target="diagnosis" class="block w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-lg">Diagnóstico</button>
+                <button data-target="solution" class="block w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-lg">Solución</button>
+                <button data-target="roadmap" class="block w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-lg">Roadmap 90 Días</button>
+                <button data-target="gov" class="block w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 rounded-lg">Gobierno & FAQ</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
+
+        <!-- SECCIÓN 1: RESUMEN EJECUTIVO -->
+        <section id="summary" class="visible-section">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
+                <div>
+                    <div class="inline-block px-4 py-1 bg-blue-50 text-[var(--cda-blue)] font-black text-[10px] uppercase tracking-widest rounded-full mb-6">Propuesta de Valor Estratégica</div>
+                    <h1 class="text-5xl md:text-7xl font-bold text-slate-900 mb-8 leading-[1.1]">
+                        Construyendo la <span style="color: var(--cda-blue);">Agilidad</span> operativa hoy.
+                    </h1>
+                    <p class="text-xl text-slate-600 mb-10 leading-relaxed">
+                        CDA presenta una intervención quirúrgica diseñada para dotar a Bancor de una infraestructura elástica y automatizada. En un mercado donde la velocidad de despliegue define la relevancia, nuestra propuesta asegura que la tecnología sea el habilitador, no el freno.
+                    </p>
+                    <div class="flex flex-wrap gap-6">
+                        <button onclick="document.querySelector('[data-target=\'maturity\']').click()" class="btn-cda-primary text-lg shadow-xl px-10 py-5">
+                            Ver Madurez Operativa <i class="fas fa-layer-group ml-2"></i>
+                        </button>
+                        <div class="flex items-center gap-4 px-6 border-l-2 border-slate-200">
+                            <i class="fas fa-check-double text-green-500 text-xl"></i>
+                            <div class="text-xs text-slate-500 font-bold uppercase tracking-tight">Validado por<br>Operaciones CDA</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="absolute -top-10 -left-10 w-32 h-32 bg-orange-100 rounded-full blur-3xl opacity-50"></div>
+                    <div class="bg-white p-10 rounded-[2.5rem] card-shadow border-t-8 relative overflow-hidden" style="border-color: var(--cda-blue);">
+                        <div class="absolute top-0 right-0 p-6 opacity-10">
+                            <i class="fas fa-quote-right text-6xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-6 text-slate-800 leading-snug">Carta de Intención</h3>
+                        <p class="text-slate-600 leading-relaxed mb-8">
+                            "Nuestro compromiso no es con la tecnología aislada, sino con la continuidad del negocio de Bancor. Entendemos que lanzamientos como Bezza Pas representan la promesa de servicio del banco. CDA asume la responsabilidad de blindar esa infraestructura mediante un modelo de ingeniería de clase mundial."
+                        </p>
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-400">LS</div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-900">Leandro Salvini</p>
+                                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Account Manager CDA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Destacados Estratégicos -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-20">
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 card-shadow text-center">
+                    <i class="fas fa-microchip text-3xl mb-4" style="color: var(--cda-blue);"></i>
+                    <h4 class="text-lg font-bold mb-2">Infra Híbrida</h4>
+                    <p class="text-xs text-slate-500">Integración de sistemas Legacy y Cloud bajo un motor IaC unificado.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 card-shadow text-center">
+                    <i class="fas fa-shield-alt text-3xl mb-4" style="color: var(--cda-orange);"></i>
+                    <h4 class="text-lg font-bold mb-2">Seguridad Nativa</h4>
+                    <p class="text-xs text-slate-500">Seguridad embebida en cada despliegue automatizado.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 card-shadow text-center">
+                    <i class="fas fa-clock text-3xl mb-4" style="color: var(--cda-blue);"></i>
+                    <h4 class="text-lg font-bold mb-2">Time-to-Value</h4>
+                    <p class="text-xs text-slate-500">Resultados tangibles en producción desde la semana 8 de intervención.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl border border-slate-100 card-shadow text-center">
+                    <i class="fas fa-graduation-cap text-3xl mb-4" style="color: var(--cda-orange);"></i>
+                    <h4 class="text-lg font-bold mb-2">Transferencia</h4>
+                    <p class="text-xs text-slate-500">Capacitación técnica total para asegurar la autonomía del Banco.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: MATRIZ DE MADUREZ -->
+        <section id="maturity" class="hidden-section">
+            <div class="mb-12">
+                <h2 class="text-4xl font-bold text-slate-900 mb-4">Matriz de Madurez Operativa</h2>
+                <p class="text-xl text-slate-600">Comparativa directa: El salto cualitativo de la gestión manual a la ingeniería automatizada de CDA.</p>
+            </div>
+
+            <div class="bg-white rounded-3xl card-shadow overflow-hidden border border-slate-100">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200">
+                                <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Dominio Técnico</th>
+                                <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Situación Actual (Manual)</th>
+                                <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Objetivo CDA (Automatizado)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr>
+                                <td class="p-6 font-bold text-slate-900">Aprovisionamiento</td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-low mb-2 inline-block">Silos Manuales</span>
+                                    <p class="text-sm text-slate-600">Dependencia de múltiples equipos de redes e infraestructura. Tiempos de entrega de 2 a 4 semanas.</p>
+                                </td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-high mb-2 inline-block">Automatizado (IaC)</span>
+                                    <p class="text-sm text-slate-600">Aprovisionamiento mediante Terraform en menos de 1 hora con validación de seguridad nativa.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-bold text-slate-900">Configuración</td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-low mb-2 inline-block">Artesanal</span>
+                                    <p class="text-sm text-slate-600">Instalación vía GUI o comandos manuales. Sin trazabilidad de cambios ni reproducibilidad de entornos.</p>
+                                </td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-high mb-2 inline-block">Declarativa</span>
+                                    <p class="text-sm text-slate-600">Recetas de Ansible versionadas. Garantía de paridad 100% entre entornos de Test y Producción.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-bold text-slate-900">Seguridad</td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-low mb-2 inline-block">Perimetral Reactiva</span>
+                                    <p class="text-sm text-slate-600">Auditoría posterior al despliegue. Los parches de seguridad dependen de la disponibilidad humana.</p>
+                                </td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-high mb-2 inline-block">SecOps Embebido</span>
+                                    <p class="text-sm text-slate-600">Escaneo automático de vulnerabilidades en el pipeline. Políticas de cumplimiento BCRA automáticas.</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-6 font-bold text-slate-900">Observabilidad</td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-low mb-2 inline-block">Alertas de Caída</span>
+                                    <p class="text-sm text-slate-600">Monitoreo basado en incidentes. Sin visión predictiva sobre el estado de la infraestructura.</p>
+                                </td>
+                                <td class="p-6">
+                                    <span class="maturity-tag tag-high mb-2 inline-block">Proactiva / Predictiva</span>
+                                    <p class="text-sm text-slate-600">Tableros en tiempo real sobre la salud de los despliegues y estabilidad de cada componente.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-blue-50 p-8 rounded-3xl border border-blue-100 flex items-center gap-6">
+                <i class="fas fa-lightbulb text-2xl text-[var(--cda-blue)]"></i>
+                <p class="text-sm text-[var(--cda-blue)] leading-relaxed font-medium">
+                    <strong>Punto de Inflexión:</strong> Migrar hacia la automatización no es solo una mejora técnica, es una liberación de talento. Al eliminar la carga operativa manual, el equipo de Bancor podrá enfocarse exclusivamente en la innovación de sus productos financieros.
+                </p>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: DIAGNÓSTICO -->
+        <section id="diagnosis" class="hidden-section">
+            <div class="mb-12">
+                <h2 class="text-4xl font-bold text-slate-900 mb-4 border-l-8 pl-6" style="border-color: var(--cda-orange);">Diagnóstico de Riesgos Actuales</h2>
+                <p class="text-xl text-slate-600">Análisis detallado de las ineficiencias del modelo manual y su impacto directo en el ROI del banco.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+                <div class="space-y-6">
+                    <div class="bg-white p-8 rounded-3xl card-shadow border-l-8 border-red-500">
+                        <h4 class="font-bold text-slate-900 text-lg mb-2">Cuello de Botella Operativo</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">El aprovisionamiento manual asíncrono paraliza el escalado. La dependencia de múltiples áreas para configurar un único ambiente genera una latencia que el mercado actual no permite.</p>
+                        <div class="bg-red-50 p-3 rounded-xl flex items-center gap-3">
+                            <i class="fas fa-exclamation-triangle text-red-500 text-xs"></i>
+                            <span class="text-[10px] font-bold text-red-700 uppercase">Impacto: Pérdida de Competitividad por Time-to-Market</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl card-shadow border-l-8 border-orange-500">
+                        <h4 class="font-bold text-slate-900 text-lg mb-2">Inconsistencia de Entornos</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">La configuración manual "artesanal" genera que el entorno de Test nunca sea idéntico al de Producción. Esto provoca fallos inesperados en el momento crítico del lanzamiento de productos digitales.</p>
+                        <div class="bg-orange-50 p-3 rounded-xl flex items-center gap-3">
+                            <i class="fas fa-bug text-orange-500 text-xs"></i>
+                            <span class="text-[10px] font-bold text-orange-700 uppercase">Impacto: Riesgo Reputacional y Costo de Corrección</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simulador de Costo de Inacción -->
+                <div class="bg-slate-900 text-white p-10 rounded-[3rem] shadow-2xl">
+                    <h3 class="text-2xl font-bold mb-6" style="color: var(--cda-orange);">Simulador: Costo de Inacción</h3>
+                    <p class="text-sm text-slate-400 mb-10">¿Cuál es el costo oculto de mantener la ineficiencia manual por cada ciclo de despliegue?</p>
+                    
+                    <div class="space-y-8 mb-10">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-xs font-bold uppercase text-slate-500">Horas Hombre por Despliegue Manual</label>
+                                <span id="hh-val" class="text-lg font-bold text-white">40hs</span>
+                            </div>
+                            <input type="range" id="hh-slider" min="10" max="100" value="40" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[#f6921e]">
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <label class="text-xs font-bold uppercase text-slate-500">Volumen de Aplicaciones Críticas</label>
+                                <span id="app-val" class="text-lg font-bold text-white">100</span>
+                            </div>
+                            <input type="range" id="app-slider" min="10" max="100" value="100" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-[#f6921e]">
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-8 rounded-3xl border border-slate-700 text-center">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Eficiencia Perdida Proyectada (Anual)</div>
+                        <div class="text-5xl font-black mb-4 text-white">$ <span id="financial-loss">0</span></div>
+                        <p class="text-xs text-slate-400">
+                            Estimación basada en el costo promedio de perfiles técnicos del Q1 2026. <br>
+                            <strong class="text-green-500">Reducción con CDA: 92% de este desperdicio operativo.</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 4: SOLUCIÓN TÉCNICA -->
+        <section id="solution" class="hidden-section">
+            <div class="mb-12 text-center">
+                <h2 class="text-5xl font-bold text-slate-900 mb-4">Arquitectura de Referencia CDA</h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto">Nuestro modelo integra las mejores prácticas mundiales para abstraer la complejidad técnica de Bancor.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+                <div class="bg-white p-8 rounded-3xl card-shadow border-b-8 border-blue-500">
+                    <div class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center mb-6 text-2xl text-blue-600"><i class="fas fa-code"></i></div>
+                    <h4 class="font-bold text-slate-900 mb-4">Infrastructure as Code (IaC)</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">Implementamos <strong>Terraform</strong> para definir cada componente de infraestructura. Lo tratamos como código: versionable, auditable y totalmente reproducible en minutos.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl card-shadow border-b-8 border-orange-500">
+                    <div class="w-14 h-14 bg-orange-50 rounded-xl flex items-center justify-center mb-6 text-2xl text-orange-600"><i class="fas fa-cog"></i></div>
+                    <h4 class="font-bold text-slate-900 mb-4">Automatización de Estados</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">Con <strong>Ansible</strong>, orquestamos la configuración interna de los sistemas. Aseguramos que parches, bases de datos y usuarios se mantengan íntegros en cada nodo.</p>
+                </div>
+                <div class="bg-white p-8 rounded-3xl card-shadow border-b-8 border-blue-500">
+                    <div class="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center mb-6 text-2xl text-blue-600"><i class="fas fa-shield-alt"></i></div>
+                    <h4 class="font-bold text-slate-900 mb-4">Gobernanza DevSecOps</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">Integramos <strong>Vault</strong> para la gestión de secretos y <strong>SonarQube</strong> para validar que el código de infraestructura sea seguro antes de tocar cualquier entorno bancario.</p>
+                </div>
+            </div>
+
+            <!-- Roles de la Célula -->
+            <div class="bg-white p-12 rounded-[3rem] card-shadow border border-slate-100">
+                <h3 class="text-3xl font-bold mb-10 text-center">Constitución de la Célula de Élite</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <div class="text-center group">
+                        <div class="w-24 h-24 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-6 text-3xl group-hover:bg-[var(--cda-blue)] group-hover:text-white transition-all">🏗️</div>
+                        <h5 class="font-bold text-slate-900 mb-2 text-sm">Solution Architect</h5>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-3 tracking-widest">Nivel: Principal / Master</p>
+                        <p class="text-xs text-slate-500 px-4">Diseño de la estrategia global y blueprinting para el ecosistema de 100 aplicaciones.</p>
+                    </div>
+                    <div class="text-center group">
+                        <div class="w-24 h-24 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-6 text-3xl group-hover:bg-[var(--cda-orange)] group-hover:text-white transition-all">⚙️</div>
+                        <h5 class="font-bold text-slate-900 mb-2 text-sm">Lead DevOps (Legacy)</h5>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-3 tracking-widest">Nivel: Senior Expert</p>
+                        <p class="text-xs text-slate-500 px-4">Especialista en la automatización de arquitecturas tradicionales (Microfocus/On-prem).</p>
+                    </div>
+                    <div class="text-center group">
+                        <div class="w-24 h-24 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-6 text-3xl group-hover:bg-[var(--cda-blue)] group-hover:text-white transition-all">☁️</div>
+                        <h5 class="font-bold text-slate-900 mb-2 text-sm">Lead DevOps (Cloud)</h5>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-3 tracking-widest">Nivel: Senior Expert</p>
+                        <p class="text-xs text-slate-500 px-4">Experto en modernización de pipelines, contenedores y servicios nativos de nube.</p>
+                    </div>
+                    <div class="text-center group">
+                        <div class="w-24 h-24 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-6 text-3xl group-hover:bg-[var(--cda-orange)] group-hover:text-white transition-all">🛡️</div>
+                        <h5 class="font-bold text-slate-900 mb-2 text-sm">SecOps Engineer</h5>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold mb-3 tracking-widest">Nivel: Senior Specialist</p>
+                        <p class="text-xs text-slate-500 px-4">Garante de cumplimiento normativo (BCRA) y seguridad embebida en la automatización.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 5: ROADMAP 12 SEMANAS -->
+        <section id="roadmap" class="hidden-section">
+            <div class="mb-12">
+                <h2 class="text-4xl font-bold text-slate-900 mb-4 border-l-8 pl-6" style="border-color: var(--cda-orange);">Roadmap de Ejecución (12 Semanas)</h2>
+                <p class="text-xl text-slate-600">De la inercia a la velocidad. Una hoja de ruta granular hacia la automatización total de Bancor.</p>
+            </div>
+
+            <div class="space-y-12">
+                <!-- Mes 1 -->
+                <div class="bg-white p-8 rounded-3xl card-shadow border-l-[16px]" style="border-color: var(--cda-blue);">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Mes 1</span>
+                            <h3 class="text-2xl font-bold text-slate-900">Fase 1: Assessment & Saneamiento</h3>
+                        </div>
+                        <span class="bg-blue-50 text-[var(--cda-blue)] text-[10px] font-bold px-4 py-2 rounded-full uppercase">Meta: Estabilización Core</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semanas 1-2</span>
+                            <p class="text-xs text-slate-600">Inventario técnico de las 100 apps. Auditoría de bloqueos en ambientes Bezza.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semana 3</span>
+                            <p class="text-xs text-slate-600">Saneamiento manual urgente de ambientes para Bezza Pas. Desbloqueo operativo.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semana 4</span>
+                            <p class="text-xs text-slate-600">Definición de Framework IaC (Terraform). Selección de arquitectura piloto.</p>
+                        </div>
+                        <div class="p-4 bg-blue-100 rounded-2xl flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-check-circle text-[var(--cda-blue)] mb-1"></i>
+                                <span class="block text-[10px] font-bold uppercase text-[var(--cda-blue)]">Capacidad Base</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mes 2 -->
+                <div class="bg-white p-8 rounded-3xl card-shadow border-l-[16px]" style="border-color: var(--cda-orange);">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Mes 2</span>
+                            <h3 class="text-2xl font-bold text-slate-900">Fase 2: Ejecución & Validación Piloto</h3>
+                        </div>
+                        <span class="bg-orange-50 text-[var(--cda-orange)] text-[10px] font-bold px-4 py-2 rounded-full uppercase">Meta: Prueba de Valor Real</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semana 5</span>
+                            <p class="text-xs text-slate-600">Codificación IaC de la aplicación piloto core. Primera versión del pipeline.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semana 6</span>
+                            <p class="text-xs text-slate-600">Integración de Ansible para gestión de configuración inmutable.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semana 7-8</span>
+                            <p class="text-xs text-slate-600">Validación de seguridad SecOps y despliegue del pipeline en Test/QA.</p>
+                        </div>
+                        <div class="p-4 bg-orange-100 rounded-2xl flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-check-circle text-[var(--cda-orange)] mb-1"></i>
+                                <span class="block text-[10px] font-bold uppercase text-[var(--cda-orange)]">Validación</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mes 3 -->
+                <div class="bg-white p-8 rounded-3xl card-shadow border-l-[16px]" style="border-color: var(--cda-blue);">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Mes 3</span>
+                            <h3 class="text-2xl font-bold text-slate-900">Fase 3: Sustentabilidad & Escalado</h3>
+                        </div>
+                        <span class="bg-blue-50 text-[var(--cda-blue)] text-[10px] font-bold px-4 py-2 rounded-full uppercase">Meta: Autonomía de Bancor</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semanas 9-10</span>
+                            <p class="text-xs text-slate-600">Elaboración del Blueprint de escalabilidad para las 100 apps restantes.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semana 11</span>
+                            <p class="text-xs text-slate-600">Talleres intensivos de transferencia técnica al equipo TI de Bancor.</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-bold text-slate-400 mb-2 block">Semana 12</span>
+                            <p class="text-xs text-slate-600">Entrega de manuales de gobernanza y cierre formal de intervención.</p>
+                        </div>
+                        <div class="p-4 bg-blue-100 rounded-2xl flex items-center justify-center">
+                            <div class="text-center">
+                                <i class="fas fa-check-circle text-[var(--cda-blue)] mb-1"></i>
+                                <span class="block text-[10px] font-bold uppercase text-[var(--cda-blue)]">Entrega Final</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 7: GOBIERNO & FAQ -->
+        <section id="gov" class="hidden-section">
+            <div class="mb-12">
+                <h2 class="text-4xl font-bold text-slate-900 mb-4 border-l-8 pl-6" style="border-color: var(--cda-orange);">Gobierno y Cumplimiento</h2>
+                <p class="text-xl text-slate-600">Transparencia y adherencia a normativas bancarias internacionales.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                <!-- BCRA Compliance -->
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-6">Cumplimiento Normativo (BCRA)</h3>
+                    <div class="space-y-6">
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 shrink-0"><i class="fas fa-shield-alt"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">Auditabilidad de Infraestructura</h4>
+                                <p class="text-xs text-slate-500 mt-1">Cada cambio en la infraestructura queda registrado en Git, cumpliendo con la trazabilidad exigida por auditoría.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-600 shrink-0"><i class="fas fa-user-lock"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">Segregación de Roles</h4>
+                                <p class="text-xs text-slate-500 mt-1">El modelo IaC permite definir flujos de aprobación técnica antes de cualquier despliegue en entornos sensibles.</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 shrink-0"><i class="fas fa-key"></i></div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">Gestión de Secretos</h4>
+                                <p class="text-xs text-slate-500 mt-1">Uso de Vault para garantizar que ninguna credencial o clave bancaria esté expuesta en texto plano.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ -->
+                <div>
+                    <h3 class="text-2xl font-bold text-slate-900 mb-6">Preguntas Frecuentes</h3>
+                    <div class="space-y-4">
+                        <div class="bg-white p-5 rounded-2xl border border-slate-100 card-shadow">
+                            <h5 class="font-bold text-sm text-slate-900 mb-2">¿Cómo se integra con nuestro equipo actual?</h5>
+                            <p class="text-xs text-slate-600">CDA actúa como el motor de ingeniería inicial. En el Mes 3, el equipo del banco se suma para heredar el Framework bajo un plan de capacitación práctica.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-100 card-shadow">
+                            <h5 class="font-bold text-sm text-slate-900 mb-2">¿Es compatible con sistemas Legacy (Microfocus)?</h5>
+                            <p class="text-xs text-slate-600">Absolutamente. Nuestra arquitectura utiliza Ansible para abstraer sistemas tradicionales, tratándolos con el mismo nivel de automatización que las apps modernas.</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-slate-100 card-shadow">
+                            <h5 class="font-bold text-sm text-slate-900 mb-2">¿Qué sucede si el Directorio demora la aprobación?</h5>
+                            <p class="text-xs text-slate-600">Contamos con un margen de maniobra técnica. La etapa de Assessment puede iniciarse con un equipo núcleo mientras se formaliza el contrato total.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-16 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="mb-8">
+                <span class="text-4xl font-black tracking-tighter" style="color: var(--cda-blue);">CDA <span style="color: var(--cda-orange);">| BANCOR</span></span>
+            </div>
+            <p class="text-slate-500 text-xs mb-6">Propuesta Estratégica Confidencial - Uso Exclusivo</p>
+            <div class="flex justify-center space-x-12 text-slate-400">
+                <span class="text-xs"><i class="fas fa-globe mr-2"></i> www.cdainfo.com</span>
+                <span class="text-xs"><i class="fas fa-envelope mr-2"></i> lsalvini@cdainfo.com</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts de Lógica -->
+    <script>
+        // Manejo de Estados
+        const state = {
+            currentSection: 'summary'
+        };
+
+        // Navegación
+        document.querySelectorAll('[data-target]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const targetId = e.currentTarget.getAttribute('data-target');
+                
+                // Actualizar UI
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                const navBtn = document.querySelector(`.nav-item[data-target="${targetId}"]`);
+                if(navBtn) navBtn.classList.add('active');
+
+                // Cambiar Secciones
+                document.querySelectorAll('section').forEach(sec => {
+                    sec.classList.remove('visible-section');
+                    sec.classList.add('hidden-section');
+                });
+                
+                const targetSec = document.getElementById(targetId);
+                targetSec.classList.remove('hidden-section');
+                targetSec.classList.add('visible-section');
+                
+                // Cerrar Menú Móvil
+                document.getElementById('mobile-menu').classList.add('hidden');
+                
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Toggle Menú Móvil
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Simulador Financiero
+        const hhSlider = document.getElementById('hh-slider');
+        const appSlider = document.getElementById('app-slider');
+        const hhVal = document.getElementById('hh-val');
+        const appVal = document.getElementById('app-val');
+        const financialLoss = document.getElementById('financial-loss');
+
+        function updateSimulation() {
+            const hours = parseInt(hhSlider.value);
+            const apps = parseInt(appSlider.value);
+            const avgRate = 45; // USD rate estimado Q1 2026
+            const ciclosAnuales = 12; // 1 despliegue por mes prom
+            
+            hhVal.innerText = `${hours}hs`;
+            appVal.innerText = apps;
+            
+            // Pérdida = horas * apps * valor hora * frecuencia
+            const totalLoss = hours * apps * avgRate * ciclosAnuales;
+            financialLoss.innerText = totalLoss.toLocaleString('es-AR');
+        }
+
+        hhSlider.addEventListener('input', updateSimulation);
+        appSlider.addEventListener('input', updateSimulation);
+
+        // Inicializar simulador al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSimulation();
+        });
+
+    </script>
+</body>
+</html>
